@@ -1448,12 +1448,11 @@ namespace SolidCP.Providers.RemoteDesktopServices
         {
             var scripts = new List<string>
             {
-                string.Format("$adgpo = [ADSI]\"{0}\"", GetGpoPath(gpoId)),
-                string.Format("$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule([System.Security.Principal.NTAccount]\"{0}\\{1}\",\"ExtendedRight\",\"Deny\",[GUID]\"edacfd8f-ffb3-11d1-b41d-00a0c968f939\")",
-                    RootDomain.Split('.').First(), GetLocalAdminsGroupName(collectionName)),
-                string.Format("$acl = $adgpo.ObjectSecurity"),
-                string.Format("$acl.AddAccessRule($rule)"),
-                string.Format("$adgpo.CommitChanges()")
+                $"$adgpo = [ADSI]\"{GetGpoPath(gpoId)}\"",
+                $"$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule([System.Security.Principal.NTAccount]\"{RootDomain.Split('.').First()}\\{GetLocalAdminsGroupName(collectionName)}\",\"ExtendedRight\",\"Deny\",[GUID]\"edacfd8f-ffb3-11d1-b41d-00a0c968f939\")",
+                $"$acl = $adgpo.ObjectSecurity",
+                $"$acl.AddAccessRule($rule)",
+                $"$adgpo.CommitChanges()"
             };
 
             object[] errors = null;
