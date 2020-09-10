@@ -89,7 +89,7 @@ namespace SolidCP.Server
             {
                 Log.WriteStart("'{0}' EditRdsCollectionSettings", ProviderSettings.ProviderName);
                 RDSProvider.EditRdsCollectionSettings(collection);
-                Log.WriteEnd("'{0}' EditRdsCollectionSettings", ProviderSettings.ProviderName);                
+                Log.WriteEnd("'{0}' EditRdsCollectionSettings", ProviderSettings.ProviderName);
             }
             catch (Exception ex)
             {
@@ -475,7 +475,7 @@ namespace SolidCP.Server
             {
                 Log.WriteStart("'{0}' LogOffRdsUser", ProviderSettings.ProviderName);
                 RDSProvider.LogOffRdsUser(unifiedSessionId, hostServer);
-                Log.WriteEnd("'{0}' LogOffRdsUser", ProviderSettings.ProviderName);                
+                Log.WriteEnd("'{0}' LogOffRdsUser", ProviderSettings.ProviderName);
             }
             catch (Exception ex)
             {
@@ -495,7 +495,7 @@ namespace SolidCP.Server
 
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.WriteError(String.Format("'{0}' GetRdsCollectionSessionHosts", ProviderSettings.ProviderName), ex);
                 throw;

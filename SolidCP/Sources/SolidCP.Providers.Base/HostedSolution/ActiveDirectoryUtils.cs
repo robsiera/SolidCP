@@ -58,7 +58,7 @@ namespace SolidCP.Providers.HostedSolution
 
         public static string[] GetGroupObjects(string group, string objectType, DirectoryEntry entry)
         {
-            List<string> rets = new List<string>();  
+            List<string> rets = new List<string>();
 
             DirectorySearcher deSearch = new DirectorySearcher
             {
@@ -558,44 +558,44 @@ namespace SolidCP.Providers.HostedSolution
 
         public static void AddOUSecurityfromUser(string ouPath, string domain, string Username, ActiveDirectoryRights rights, AccessControlType type, ActiveDirectorySecurityInheritance inheritance)
         {
-                DirectoryEntry ou = GetADObject(ouPath);
-                
+            DirectoryEntry ou = GetADObject(ouPath);
 
-                NTAccount ADUser = new NTAccount(domain, Username);
 
-                ActiveDirectoryAccessRule ruleRead = new ActiveDirectoryAccessRule(
-                                                                ADUser,
-                                                                rights,
-                                                                type,
-                                                                inheritance
-                                                                );
+            NTAccount ADUser = new NTAccount(domain, Username);
 
-                ou.ObjectSecurity.AddAccessRule(ruleRead);
-                ou.CommitChanges();
-                ou.Close();
-            
+            ActiveDirectoryAccessRule ruleRead = new ActiveDirectoryAccessRule(
+                                                            ADUser,
+                                                            rights,
+                                                            type,
+                                                            inheritance
+                                                            );
+
+            ou.ObjectSecurity.AddAccessRule(ruleRead);
+            ou.CommitChanges();
+            ou.Close();
+
         }
 
         public static void RemoveOUSecurityfromUser(string ouPath, string domain, string Username, ActiveDirectoryRights rights, AccessControlType type, ActiveDirectorySecurityInheritance inheritance)
         {
-                DirectoryEntry ou = GetADObject(ouPath);
-                NTAccount ADUser = new NTAccount(domain, Username);
-                ActiveDirectoryAccessRule ruleRead = new ActiveDirectoryAccessRule(
-                                                                ADUser,
-                                                                rights,
-                                                                type,
-                                                                inheritance
-                                                                );
+            DirectoryEntry ou = GetADObject(ouPath);
+            NTAccount ADUser = new NTAccount(domain, Username);
+            ActiveDirectoryAccessRule ruleRead = new ActiveDirectoryAccessRule(
+                                                            ADUser,
+                                                            rights,
+                                                            type,
+                                                            inheritance
+                                                            );
 
-                ou.ObjectSecurity.RemoveAccessRule(ruleRead);
-                ou.CommitChanges();
-                ou.Close();
+            ou.ObjectSecurity.RemoveAccessRule(ruleRead);
+            ou.CommitChanges();
+            ou.Close();
         }
 
         public static void RemoveOUSecurityfromSid(string ouPath, WellKnownSidType UserSid, ActiveDirectoryRights rights, AccessControlType type, ActiveDirectorySecurityInheritance inheritance)
         {
             DirectoryEntry ou = GetADObject(ouPath);
-            
+
 
             SecurityIdentifier identity = null;
             identity = new SecurityIdentifier(UserSid, null);
@@ -607,7 +607,7 @@ namespace SolidCP.Providers.HostedSolution
                                                             inheritance
                                                             );
 
-            
+
 
             ou.ObjectSecurity.RemoveAccessRule(ruleRead);
             ou.CommitChanges();

@@ -22,8 +22,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 session = InitialSessionState.CreateDefault();
                 session.ImportPSModule(new string[] { "ServerManager", "RemoteDesktop", "RemoteDesktopServices" });
             }
-            Runspace runSpace = RunspaceFactory.CreateRunspace(session);            
-            runSpace.Open();            
+            Runspace runSpace = RunspaceFactory.CreateRunspace(session);
+            runSpace.Open();
             runSpace.SessionStateProxy.SetVariable("ConfirmPreference", "none");
             Log.WriteEnd("OpenRunspace");
             return runSpace;
@@ -42,7 +42,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 Log.WriteError("Runspace error", ex);
             }
-        }     
+        }
 
         public static RdsCollection GetCollection(this Runspace runspace, string collectionName, string connectionBroker, string primaryDomainController)
         {
@@ -99,7 +99,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             if (psObjects != null)
             {
-                foreach(var psObject in psObjects)
+                foreach (var psObject in psObjects)
                 {
                     rdsServers.Add(GetPSObjectProperty(psObject, "SessionHost").ToString());
                 }
@@ -128,7 +128,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             if (psObject != null)
             {
                 foreach (var prop in psObject.Properties)
-                {                    
+                {
                     if (prop.Name.ToLower() != "id" && prop.Name.ToLower() != "rdscollectionid")
                     {
                         result.Add(new RdsCollectionSetting
@@ -199,7 +199,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             ScriptBlock sb = invoke.Invoke(string.Format("{{{0}}}", commandString))[0].BaseObject as ScriptBlock;
 
-            invokeCommand.Parameters.Add("ScriptBlock", sb);            
+            invokeCommand.Parameters.Add("ScriptBlock", sb);
 
             return ExecuteShellCommand(runSpace, invokeCommand, false, primaryDomainController, out errors);
         }
@@ -212,14 +212,15 @@ namespace SolidCP.Providers.RemoteDesktopServices
             RunspaceInvoke invoke = new RunspaceInvoke();
             string commandString = moduleImports.Any() ? string.Format("import-module {0};", string.Join(",", moduleImports)) : string.Empty;
 
-            commandString = string.Format("{0};{1}", commandString, string.Join(";", scripts.ToArray()));            
+            commandString = string.Format("{0};{1}", commandString, string.Join(";", scripts.ToArray()));
 
             ScriptBlock sb = invoke.Invoke(string.Format("{{{0}}}", commandString))[0].BaseObject as ScriptBlock;
 
             invokeCommand.Parameters.Add("ScriptBlock", sb);
 
-            return ExecuteShellCommand(runSpace, invokeCommand, false, primaryDomainController, out errors);
-        }        
+            var r = ExecuteShellCommand(runSpace, invokeCommand, false, primaryDomainController, out errors);
+            return r;
+        }
 
         public static Collection<PSObject> ExecuteShellCommand(this Runspace runspace, List<string> scripts, out object[] errors)
         {
@@ -233,7 +234,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 {
                     pipeLine.Commands.AddScript(script);
                 }
-                
+
                 results = pipeLine.Invoke();
 
                 if (pipeLine.Error != null && pipeLine.Error.Count > 0)
@@ -257,7 +258,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         {
             object[] errors;
             return ExecuteShellCommand(runSpace, cmd, useDomainController, primaryDomainController, out errors);
-        } 
+        }
 
         public static Collection<PSObject> ExecuteShellCommand(this Runspace runSpace, Command cmd, bool useDomainController, string primaryDomainController,
             out object[] errors)

@@ -71,7 +71,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private const string Computers = "Computers";
         private const string AdDcComputers = "Domain Controllers";
         private const string Users = "users";
-        private const string Admins = "Admins";        
+        private const string Admins = "Admins";
         private const string RdsGroupFormat = "rds-{0}-{1}";
         private const string RdsModuleName = "RemoteDesktopServices";
         private const string AddNpsString = "netsh nps add np name=\"\"{0}\"\" policysource=\"1\" processingorder=\"{1}\" conditionid=\"0x3d\" conditiondata=\"^5$\" conditionid=\"0x1fb5\" conditiondata=\"{2}\" conditionid=\"0x1e\" conditiondata=\"UserAuthType:(PW|CA)\" profileid=\"0x1005\" profiledata=\"TRUE\" profileid=\"0x100f\" profiledata=\"TRUE\" profileid=\"0x1009\" profiledata=\"0x7\" profileid=\"0x1fe6\" profiledata=\"0x40000000\"";
@@ -80,7 +80,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private const string RdsCollectionComputersGroupDescription = "SCP RDS Collection Computers";
         private const string RdsServersOU = "RDSServersOU";
         private const string RdsServersRootOU = "RDSRootServersOU";
-        private const string RDSHelpDeskComputerGroup = "SolidCP-RDSHelpDesk-Computer";        
+        private const string RDSHelpDeskComputerGroup = "SolidCP-RDSHelpDesk-Computer";
         private const string RDSHelpDeskGroup = "SCP-HelpDeskAdministrators";
         private const string RDSHelpDeskGroupDescription = "SCP Help Desk Administrators";
         private const string LocalAdministratorsGroupName = "Administrators";
@@ -179,13 +179,13 @@ namespace SolidCP.Providers.RemoteDesktopServices
         #region HostingServiceProvider methods
 
         public override bool IsInstalled()
-        {            
+        {
             Server.Utils.OS.WindowsVersion version = SolidCP.Server.Utils.OS.GetVersion();
             return version == SolidCP.Server.Utils.OS.WindowsVersion.WindowsServer2012 || version == SolidCP.Server.Utils.OS.WindowsVersion.WindowsServer2012R2 || version == SolidCP.Server.Utils.OS.WindowsVersion.WindowsServer2016;
         }
 
         public override string[] Install()
-        {            
+        {
             Runspace runSpace = null;
             PSObject feature = null;
 
@@ -195,7 +195,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
                 if (!IsFeatureInstalled("Desktop-Experience", runSpace))
                 {
-                    feature = AddFeature(runSpace, "Desktop-Experience", true, false);                    
+                    feature = AddFeature(runSpace, "Desktop-Experience", true, false);
                 }
 
                 if (!IsFeatureInstalled("NET-Framework-Core", runSpace))
@@ -205,7 +205,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
                 if (!IsFeatureInstalled("NET-Framework-45-Core", runSpace))
                 {
-                    feature = AddFeature(runSpace, "NET-Framework-45-Core", true, false);                    
+                    feature = AddFeature(runSpace, "NET-Framework-45-Core", true, false);
                 }
             }
             finally
@@ -213,7 +213,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 runSpace.CloseRunspace();
             }
 
-            return new string[]{};
+            return new string[] { };
         }
 
         public bool CheckRDSServerAvaliable(string hostname)
@@ -249,7 +249,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 runspace = RdsRunspaceExtensions.OpenRunspace();
 
                 Command cmd = new Command("Get-RDSessionHost");
-                cmd.Parameters.Add("CollectionName", collectionName);                
+                cmd.Parameters.Add("CollectionName", collectionName);
                 cmd.Parameters.Add("ConnectionBroker", ConnectionBroker);
                 object[] errors;
 
@@ -259,7 +259,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 {
                     result.Add(RdsRunspaceExtensions.GetPSObjectProperty(host, "SessionHost").ToString());
                 }
-            }            
+            }
             finally
             {
                 runspace.CloseRunspace();
@@ -278,7 +278,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 runSpace = RdsRunspaceExtensions.OpenRunspace();
 
                 foreach (var server in servers)
-                {                    
+                {
                     if (!ExistRdsServerInDeployment(runSpace, server))
                     {
                         AddRdsServerToDeployment(runSpace, server);
@@ -298,7 +298,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         public bool CreateCollection(string organizationId, RdsCollection collection)
-        {            
+        {
             var result = true;
 
             Runspace runSpace = null;
@@ -308,12 +308,12 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 runSpace = RdsRunspaceExtensions.OpenRunspace();
                 Log.WriteInfo("Creating Collection");
                 var existingServers = GetServersExistingInCollections(runSpace);
-                existingServers = existingServers.Select(x => x.ToUpper()).Intersect(collection.Servers.Select(x => x.FqdName.ToUpper())).ToList();                
+                existingServers = existingServers.Select(x => x.ToUpper()).Intersect(collection.Servers.Select(x => x.FqdName.ToUpper())).ToList();
 
                 if (existingServers.Any())
-                {                                        
+                {
                     throw new Exception(string.Format("Server{0} {1} already added to another collection", existingServers.Count == 1 ? "" : "s", string.Join(" ,", existingServers.ToArray())));
-                }                
+                }
 
                 foreach (var server in collection.Servers)
                 {
@@ -321,8 +321,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     //Do not install feature here                        
 
                     if (!ExistRdsServerInDeployment(runSpace, server))
-                    {                        
-                        AddRdsServerToDeployment(runSpace, server);                        
+                    {
+                        AddRdsServerToDeployment(runSpace, server);
                     }
                 }
 
@@ -337,7 +337,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     cmd.Parameters.Add("CollectionDescription", collection.Description);
                 }
 
-                var collectionPs = runSpace.ExecuteShellCommand(cmd, false, PrimaryDomainController).FirstOrDefault();                
+                var collectionPs = runSpace.ExecuteShellCommand(cmd, false, PrimaryDomainController).FirstOrDefault();
 
                 if (collectionPs == null)
                 {
@@ -357,7 +357,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 string groupName = GetLocalAdminsGroupName(collection.Name);
                 string groupPath = GetGroupPath(organizationId, collection.Name, groupName);
                 string localAdminsGroupSamAccountName = CheckOrCreateAdGroup(groupPath, GetOrganizationPath(organizationId), groupName, SCPAdministratorsGroupDescription);
-                CheckOrCreateAdGroup(GetUsersGroupPath(organizationId, collection.Name), orgPath, GetUsersGroupName(collection.Name), RdsCollectionUsersGroupDescription);                
+                CheckOrCreateAdGroup(GetUsersGroupPath(organizationId, collection.Name), orgPath, GetUsersGroupName(collection.Name), RdsCollectionUsersGroupDescription);
 
                 var capPolicyName = GetPolicyName(organizationId, collection.Name, RdsPolicyTypes.RdCap);
                 var rapPolicyName = GetPolicyName(organizationId, collection.Name, RdsPolicyTypes.RdRap);
@@ -381,13 +381,13 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 }
 
                 //add user group to collection
-                AddUserGroupsToCollection(runSpace, collection.Name, new List<string> { GetUsersGroupName(collection.Name) });                
+                AddUserGroupsToCollection(runSpace, collection.Name, new List<string> { GetUsersGroupName(collection.Name) });
 
                 //add session servers to group
                 foreach (var rdsServer in collection.Servers)
                 {
                     AddComputerToCollectionAdComputerGroup(organizationId, collection.Name, rdsServer);
-                    MoveSessionHostToCollectionOU(rdsServer.Name, collection.Name, organizationId);                    
+                    MoveSessionHostToCollectionOU(rdsServer.Name, collection.Name, organizationId);
                     AddAdGroupToLocalAdmins(runSpace, rdsServer.FqdName, helpDeskGroupSamAccountName);
                     AddAdGroupToLocalAdmins(runSpace, rdsServer.FqdName, localAdminsGroupSamAccountName);
                     ActiveDirectoryUtils.AddOUSecurityfromUser(GetOrganizationPath(organizationId), ServerSettings.ADRootDomain.ToLower(), rdsServer.Name + "$", ActiveDirectoryRights.GenericRead, AccessControlType.Allow, ActiveDirectorySecurityInheritance.SelfAndChildren);
@@ -405,7 +405,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     RemoveCollection(organizationId, collection.Name, collection.Servers);
                     throw new Exception("Collection not created - user groups configuration error");
                 }
-            }                   
+            }
             finally
             {
                 runSpace.CloseRunspace();
@@ -444,7 +444,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         public void EditRdsCollectionSettings(RdsCollection collection)
-        {            
+        {
             Runspace runSpace = null;
 
             try
@@ -475,7 +475,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             try
             {
                 runSpace = RdsRunspaceExtensions.OpenRunspace();
-                result = GetRdsUserSessionsInternal(collectionName, runSpace);                              
+                result = GetRdsUserSessionsInternal(collectionName, runSpace);
             }
             finally
             {
@@ -486,7 +486,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         public void LogOffRdsUser(string unifiedSessionId, string hostServer)
-        {            
+        {
             Runspace runSpace = null;
 
             try
@@ -504,7 +504,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 {
                     throw new Exception(string.Join("r\\n\\", errors.Select(e => e.ToString()).ToArray()));
                 }
-            }            
+            }
             finally
             {
                 runSpace.CloseRunspace();
@@ -531,7 +531,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
         public RdsCollection GetCollection(string collectionName)
         {
-            RdsCollection collection =null;
+            RdsCollection collection = null;
 
             Runspace runSpace = null;
 
@@ -586,7 +586,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     RemoveNpsPolicy(runSpace, CentralNpsHost, capPolicyName);
                 }
 
-                foreach(var server in servers)
+                foreach (var server in servers)
                 {
                     RemoveRdsServerFromDeployment(runSpace, server);
                     RemoveGroupFromLocalAdmin(server.FqdName, server.Name, GetLocalAdminsGroupName(collectionName), runSpace);
@@ -610,7 +610,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             }
 
             return result;
-        }        
+        }
 
         public bool SetUsersInCollection(string organizationId, string collectionName, List<string> users)
         {
@@ -653,7 +653,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
                 CheckOrCreateHelpDeskComputerGroup();
 
-                foreach(var gateway in Gateways)
+                foreach (var gateway in Gateways)
                 {
                     CreateHelpDeskRdCapForce(runSpace, gateway);
                     CreateHelpDeskRdRapForce(runSpace, gateway);
@@ -669,7 +669,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 AddComputerToCollectionAdComputerGroup(organizationId, collectionName, server);
                 Log.WriteInfo("AddSessionHostServerToCollection Security 0: {0}, 1: {1} 2: {2}", GetOrganizationPath(organizationId), ServerSettings.ADRootDomain.ToLower(), server.Name + "$");
                 ActiveDirectoryUtils.AddOUSecurityfromUser(GetOrganizationPath(organizationId), ServerSettings.ADRootDomain.ToLower(), server.Name + "$", ActiveDirectoryRights.GenericRead, AccessControlType.Allow, ActiveDirectorySecurityInheritance.SelfAndChildren);
-            }            
+            }
             finally
             {
                 runSpace.CloseRunspace();
@@ -686,7 +686,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
         public void MoveSessionHostsToCollectionOU(List<RdsServer> servers, string collectionName, string organizationId)
         {
-            foreach(var server in servers)
+            foreach (var server in servers)
             {
                 MoveSessionHostToCollectionOU(server.Name, collectionName, organizationId);
             }
@@ -704,7 +704,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 cmd.Parameters.Add("ConnectionBroker", ConnectionBroker);
                 cmd.Parameters.Add("SessionHost", server.FqdName);
                 cmd.Parameters.Add("Force", true);
-                
+
                 runSpace.ExecuteShellCommand(cmd, false, PrimaryDomainController);
 
                 RemoveGroupFromLocalAdmin(server.FqdName, server.Name, GetLocalAdminsGroupName(collectionName), runSpace);
@@ -813,7 +813,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 cmd.Parameters.Add("CommandLineSetting", remoteApp.CommandLineSettings.ToString());
 
                 if (remoteApp.CommandLineSettings == CommandLineSettings.Require)
-                {                    
+                {
                     cmd.Parameters.Add("RequiredCommandLine", remoteApp.RequiredCommandLine);
                 }
 
@@ -830,7 +830,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     Log.WriteInfo(string.Format("{0} users added successfully", remoteApp.DisplayName));
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 result = false;
             }
@@ -979,7 +979,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             return result;
         }
-        
+
         #endregion
 
         #region Gateaway (RD CAP | RD RAP)
@@ -992,7 +992,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             var processingOrders = showResult.Where(x => Convert.ToString(x).ToLower().Contains("processing order")).Select(x => Convert.ToString(x));
             var count = 0;
 
-            foreach(var processingOrder in processingOrders)
+            foreach (var processingOrder in processingOrders)
             {
                 var order = Convert.ToInt32(processingOrder.Remove(0, processingOrder.LastIndexOf("=") + 1).Replace(" ", ""));
 
@@ -1027,7 +1027,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 RemoveRdCap(runSpace, gatewayHost, policyName);
             }
 
-            var userGroupParametr = string.Format("@({0})",string.Join(",", groups.Select(x => string.Format("\"{0}@{1}\"", x, RootDomain)).ToArray()));
+            var userGroupParametr = string.Format("@({0})", string.Join(",", groups.Select(x => string.Format("\"{0}@{1}\"", x, RootDomain)).ToArray()));
 
             Command rdCapCommand = new Command("New-Item");
             rdCapCommand.Parameters.Add("Path", string.Format("\"{0}\"", CapPath));
@@ -1039,7 +1039,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private void CreateHelpDeskRdCapForce(Runspace runSpace, string gatewayHost)
-        {                        
+        {
             if (ItemExistsRemote(runSpace, gatewayHost, Path.Combine(CapPath, RDSHelpDeskRdCapPolicyName)))
             {
                 return;
@@ -1076,7 +1076,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             object[] errors;
 
             for (int i = 0; i < 3; i++)
-            {                
+            {
                 runSpace.ExecuteRemoteShellCommand(gatewayHost, rdRapCommand, PrimaryDomainController, out errors, RdsModuleName);
 
                 if (errors == null || !errors.Any())
@@ -1097,7 +1097,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         internal void CreateRdRapForce(Runspace runSpace, string gatewayHost, string policyName, string collectionName, List<string> groups)
-        {            
+        {
             //New-Item -Path "RDS:\GatewayServer\RAP" -Name "Allow Connections To Everywhere" -UserGroups "Administrators@." -ComputerGroupType 1
             //Set-Item -Path "RDS:\GatewayServer\RAP\Allow Connections To Everywhere\PortNumbers" -Value 3389,3390
 
@@ -1105,16 +1105,16 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 RemoveRdRap(runSpace, gatewayHost, policyName);
             }
-            
+
             var userGroupParametr = string.Format("@({0})", string.Join(",", groups.Select(x => string.Format("\"{0}@{1}\"", x, RootDomain)).ToArray()));
             var computerGroupParametr = string.Format("\"{0}@{1}\"", GetComputersGroupName(collectionName), RootDomain);
 
             Command rdRapCommand = new Command("New-Item");
             rdRapCommand.Parameters.Add("Path", string.Format("\"{0}\"", RapPath));
             rdRapCommand.Parameters.Add("Name", string.Format("\"{0}\"", policyName));
-            rdRapCommand.Parameters.Add("UserGroups", userGroupParametr);            
+            rdRapCommand.Parameters.Add("UserGroups", userGroupParametr);
             rdRapCommand.Parameters.Add("ComputerGroupType", 1);
-            rdRapCommand.Parameters.Add("ComputerGroup", computerGroupParametr);            
+            rdRapCommand.Parameters.Add("ComputerGroup", computerGroupParametr);
 
             object[] errors;
 
@@ -1132,8 +1132,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 {
                     Log.WriteWarning(string.Join("\r\n", errors.Select(e => e.ToString()).ToArray()));
                 }
-            }            
-        }        
+            }
+        }
 
         internal void RemoveRdRap(Runspace runSpace, string gatewayHost, string name)
         {
@@ -1146,7 +1146,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
         public void SaveRdsCollectionLocalAdmins(List<string> users, List<string> hosts, string collectionName, string organizationId)
         {
-            Runspace runspace = null;            
+            Runspace runspace = null;
 
             try
             {
@@ -1164,27 +1164,27 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 }
 
                 foreach (var hostName in hosts)
-                {                                                     
+                {
                     AddAdGroupToLocalAdmins(runspace, hostName, helpDeskGroupSamAccountName);
                     AddAdGroupToLocalAdmins(runspace, hostName, localAdminsGroupSamAccountName);
 
                     SetUsersToCollectionAdGroup(collectionName, organizationId, users, GetLocalAdminsGroupName(collectionName), groupPath);
-                }                
+                }
             }
             finally
             {
                 runspace.CloseRunspace();
-            }                       
+            }
         }
 
         public List<string> GetRdsCollectionLocalAdmins(string organizationId, string collectionName)
         {
             string groupName = GetLocalAdminsGroupName(collectionName);
             return GetUsersToCollectionAdGroup(collectionName, groupName, organizationId);
-        }                     
-        
+        }
+
         private void RemoveGroupFromLocalAdmin(string fqdnName, string hostName, string groupName, Runspace runspace)
-        {            
+        {
             var scripts = new List<string>
             {
                 string.Format("$LocalAdminsName = (Get-WMIObject -Class Win32_Group -Filter \"LocalAccount=TRUE and SID='S-1-5-32-544'\").name"),
@@ -1196,29 +1196,29 @@ namespace SolidCP.Providers.RemoteDesktopServices
             object[] errors = null;
             runspace.ExecuteRemoteShellCommand(fqdnName, scripts, PrimaryDomainController, out errors);
         }
-        
+
         #endregion
 
         #region GPO   
-     
+
         public void ApplyGPO(string organizationId, string collectionName, RdsServerSettings serverSettings)
         {
             string administratorsGpo = string.Format("{0}-administrators", collectionName);
             string usersGpo = string.Format("{0}-users", collectionName);
-            Runspace runspace = null;            
+            Runspace runspace = null;
 
             try
             {
-                runspace = RdsRunspaceExtensions.OpenRunspace();                
+                runspace = RdsRunspaceExtensions.OpenRunspace();
                 string collectionComputersPath = GetComputerGroupPath(organizationId, collectionName);
 
                 CreatePolicy(runspace, organizationId, string.Format("{0}-administrators", collectionName),
                     new DirectoryEntry(GetGroupPath(organizationId, collectionName, GetLocalAdminsGroupName(collectionName))), new DirectoryEntry(collectionComputersPath), collectionName);
                 CreateUsersPolicy(runspace, organizationId, string.Format("{0}-users", collectionName),
                     new DirectoryEntry(GetUsersGroupPath(organizationId, collectionName)), new DirectoryEntry(collectionComputersPath), collectionName);
-                CreateHelpDeskPolicy(runspace, new DirectoryEntry(GetHelpDeskGroupPath(RDSHelpDeskGroup)), new DirectoryEntry(collectionComputersPath), organizationId, collectionName);                
+                CreateHelpDeskPolicy(runspace, new DirectoryEntry(GetHelpDeskGroupPath(RDSHelpDeskGroup)), new DirectoryEntry(collectionComputersPath), organizationId, collectionName);
                 RemoveRegistryValue(runspace, ScreenSaverGpoKey, administratorsGpo);
-                RemoveRegistryValue(runspace, ScreenSaverGpoKey, usersGpo);                
+                RemoveRegistryValue(runspace, ScreenSaverGpoKey, usersGpo);
                 RemoveRegistryValue(runspace, RemoveRestartGpoKey, administratorsGpo);
                 RemoveRegistryValue(runspace, RemoveRestartGpoKey, usersGpo);
                 RemoveRegistryValue(runspace, DisableTaskManagerGpoKey, administratorsGpo);
@@ -1252,8 +1252,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 double result;
 
                 if (setting != null && !string.IsNullOrEmpty(setting.PropertyValue) && double.TryParse(setting.PropertyValue, out result))
-                {                    
-                    SetRegistryValue(setting, runspace, ScreenSaverTimeoutGpoKey, administratorsGpo, usersGpo, ScreenSaverTimeoutValueName, setting.PropertyValue, "string");                                    
+                {
+                    SetRegistryValue(setting, runspace, ScreenSaverTimeoutGpoKey, administratorsGpo, usersGpo, ScreenSaverTimeoutValueName, setting.PropertyValue, "string");
                 }
 
                 SetRdsSessionHostPermissions(runspace, serverSettings, usersGpo, administratorsGpo);
@@ -1338,7 +1338,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 SetRegistryValue(runspace, RDSSessionGpoKey, administratorsGpo, "3", RDSSessionGpoValueName, "DWord");
             }
         }
-   
+
         private void RemoveRegistryValue(Runspace runspace, string key, string gpoName)
         {
             Command cmd = new Command("Remove-GPRegistryValue");
@@ -1371,7 +1371,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             Command cmd = new Command("Set-GPRegistryValue");
             cmd.Parameters.Add("Name", gpoName);
             cmd.Parameters.Add("Key", string.Format("\"{0}\"", key));
-            cmd.Parameters.Add("Value", value);            
+            cmd.Parameters.Add("Value", value);
             cmd.Parameters.Add("Type", type);
 
             Collection<PSObject> result = runspace.ExecuteRemoteShellCommand(PrimaryDomainController, cmd, PrimaryDomainController);
@@ -1583,7 +1583,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             AppendDomainPath(sb, RootDomain);
 
             return sb.ToString();
-        }                
+        }
 
         private void CheckOrCreateHelpDeskComputerGroup()
         {
@@ -1594,7 +1594,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private string CheckOrCreateAdGroup(string groupPath, string rootPath, string groupName, string description)
-        {            
+        {
             DirectoryEntry groupEntry = null;
 
             if (!ActiveDirectoryUtils.AdObjectExists(groupPath))
@@ -1623,16 +1623,16 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private void AddAdGroupToLocalAdmins(Runspace runspace, string hostName, string samAccountName)
-        {                                    
+        {
             var scripts = new List<string>
             {
                 string.Format("$LocalAdminsName = (Get-WMIObject -Class Win32_Group -Filter \"LocalAccount=TRUE and SID='S-1-5-32-544'\").name"),
                 string.Format("$GroupObj = [ADSI]\"WinNT://{0}/$LocalAdminsName\"", hostName),
                 string.Format("$GroupObj.Add(\"WinNT://{0}/{1}\")", ServerSettings.ADRootDomain, samAccountName)
             };
-            
+
             object[] errors = null;
-            runspace.ExecuteRemoteShellCommand(hostName, scripts, PrimaryDomainController, out errors);                 
+            runspace.ExecuteRemoteShellCommand(hostName, scripts, PrimaryDomainController, out errors);
         }
 
         #endregion
@@ -1645,19 +1645,19 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             try
             {
-                var guid = Guid.NewGuid();                
-                var x509Cert = new X509Certificate2(certificate, password, X509KeyStorageFlags.Exportable);                                
+                var guid = Guid.NewGuid();
+                var x509Cert = new X509Certificate2(certificate, password, X509KeyStorageFlags.Exportable);
                 var filePath = SaveCertificate(certificate, guid);
                 runspace = RdsRunspaceExtensions.OpenRunspace();
 
                 foreach (var hostName in hostNames)
-                {                    
+                {
                     var destinationPath = string.Format("\\\\{0}\\c$\\{1}.pfx", hostName, guid);
                     var errors = CopyCertificateFile(runspace, filePath, destinationPath);
 
                     if (!errors.Any())
                     {
-                        RemoveCertificate(runspace, hostName, x509Cert.Thumbprint);                        
+                        RemoveCertificate(runspace, hostName, x509Cert.Thumbprint);
                         errors = ImportCertificate(runspace, hostName, password, string.Format("c:\\{0}.pfx", guid), x509Cert.Thumbprint);
                     }
 
@@ -1679,8 +1679,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 runspace.CloseRunspace();
             }
-        }  
- 
+        }
+
         private void RemoveCertificate(Runspace runspace, string hostName, string thumbprint)
         {
             var scripts = new List<string>
@@ -1695,7 +1695,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private object[] ImportCertificate(Runspace runspace, string hostName, string password, string certificatePath, string thumbprint)
         {
             var scripts = new List<string>
-            {                
+            {
                 string.Format("$mypwd = ConvertTo-SecureString -String {0} -Force –AsPlainText", password),
                 string.Format("Import-PfxCertificate –FilePath \"{0}\" cert:\\localMachine\\my -Password $mypwd", certificatePath),
                 string.Format("$cert = Get-Item cert:\\LocalMachine\\My\\{0}", thumbprint),
@@ -1722,16 +1722,16 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             return filePath;
         }
-     
+
         private object[] CopyCertificateFile(Runspace runspace, string filePath, string destinationPath)
-        {                                  
+        {
             var scripts = new List<string>
             {
                 string.Format("Copy-Item \"{0}\" -Destination \"{1}\" -Force", filePath, destinationPath)
             };
 
             object[] errors = null;
-            runspace.ExecuteShellCommand(scripts, out errors);            
+            runspace.ExecuteShellCommand(scripts, out errors);
 
             return errors;
         }
@@ -1767,7 +1767,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     CollectionName = collection.Name,
                     Description = collection.Description
                 };
-                
+
                 if (collection == null)
                 {
                     throw new NullReferenceException(string.Format("Collection \"{0}\" not found", collectionName));
@@ -1804,13 +1804,13 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         public void ImportCollection(string organizationId, RdsCollection collection, List<string> users)
-        {            
+        {
             Runspace runSpace = null;
 
             try
             {
                 Log.WriteStart(string.Format("Starting collection import: {0}", collection.Name));
-                runSpace = RdsRunspaceExtensions.OpenRunspace();                                                
+                runSpace = RdsRunspaceExtensions.OpenRunspace();
                 var orgPath = GetOrganizationPath(organizationId);
                 CheckOrCreateAdGroup(GetComputerGroupPath(organizationId, collection.Name), orgPath, GetComputersGroupName(collection.Name), RdsCollectionComputersGroupDescription);
                 CheckOrCreateHelpDeskComputerGroup();
@@ -1925,32 +1925,32 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private void SetUsersToCollectionAdGroup(string collectionName, string organizationId, IEnumerable<string> users, string groupName, string groupPath)
-        {            
+        {
             var orgPath = GetOrganizationPath(organizationId);
             var orgEntry = ActiveDirectoryUtils.GetADObject(orgPath);
             var groupUsers = ActiveDirectoryUtils.GetGroupObjects(groupName, "user", orgEntry);
-            
+
             foreach (string userPath in groupUsers)
             {
-                ActiveDirectoryUtils.RemoveObjectFromGroup(userPath, groupPath);                
-            }          
-            
+                ActiveDirectoryUtils.RemoveObjectFromGroup(userPath, groupPath);
+            }
+
             foreach (var user in users)
-            {                
-                var userPath = GetUserPath(organizationId, user);                
+            {
+                var userPath = GetUserPath(organizationId, user);
 
                 if (ActiveDirectoryUtils.AdObjectExists(userPath))
-                {                    
+                {
                     var userObject = ActiveDirectoryUtils.GetADObject(userPath);
-                    var samName = (string)ActiveDirectoryUtils.GetADObjectProperty(userObject, "sAMAccountName");                                        
-                    ActiveDirectoryUtils.AddObjectToGroup(userPath, groupPath);                    
-                }                
+                    var samName = (string)ActiveDirectoryUtils.GetADObjectProperty(userObject, "sAMAccountName");
+                    ActiveDirectoryUtils.AddObjectToGroup(userPath, groupPath);
+                }
             }
         }
 
         private List<string> GetUsersToCollectionAdGroup(string collectionName, string groupName, string organizationId)
         {
-            var users = new List<string>();    
+            var users = new List<string>();
             var orgPath = GetOrganizationPath(organizationId);
             var orgEntry = ActiveDirectoryUtils.GetADObject(orgPath);
 
@@ -1963,7 +1963,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             }
 
             return users;
-        }        
+        }
 
         private void AddUserGroupsToCollection(Runspace runSpace, string collectionName, List<string> groups)
         {
@@ -1976,14 +1976,14 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private void AddComputerToCollectionAdComputerGroup(string organizationId, string collectionName, RdsServer server)
-        {            
-            var computerGroupName = GetComputersGroupName( collectionName);            
+        {
+            var computerGroupName = GetComputersGroupName(collectionName);
             var computerObject = GetComputerObject(server.Name);
 
             Log.WriteInfo(string.Format("ComputerGroupName: {0}\r\nServerName: {1}\r\nCollectionName: {2}", computerGroupName, server.Name, collectionName));
 
             if (computerObject != null)
-            {                
+            {
                 var samName = (string)ActiveDirectoryUtils.GetADObjectProperty(computerObject, "sAMAccountName");
                 Log.WriteInfo(string.Format("sAMAccountName: {0}\r\nPath: {1}\r\n", samName, computerObject.Path));
 
@@ -2012,12 +2012,12 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private void RemoveComputerFromCollectionAdComputerGroup(string organizationId, string collectionName, RdsServer server)
-        {            
+        {
             var computerGroupName = GetComputersGroupName(collectionName);
             var computerObject = GetComputerObject(server.Name);
 
             if (computerObject != null)
-            {                
+            {
                 var samName = (string)ActiveDirectoryUtils.GetADObjectProperty(computerObject, "sAMAccountName");
 
                 if (ActiveDirectoryUtils.IsComputerInGroup(samName, computerGroupName))
@@ -2058,7 +2058,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     feature = AddFeature(runSpace, hostName, "NET-Framework-Core", true, false);
                     Log.WriteInfo("Add Feature NET-Framework-Core: {0}", hostName);
                 }
-            }            
+            }
             finally
             {
                 runSpace.CloseRunspace();
@@ -2070,7 +2070,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private void CheckOrCreateComputersRoot(string computersRootPath)
         {
             if (ActiveDirectoryUtils.AdObjectExists(computersRootPath) && !ActiveDirectoryUtils.AdObjectExists(GetRdsServersGroupPath()))
-            {                
+            {
                 //ActiveDirectoryUtils.CreateGroup(computersRootPath, RdsServersRootOU);
                 ActiveDirectoryUtils.CreateOrganizationalUnit(RdsServersRootOU, computersRootPath);
             }
@@ -2095,7 +2095,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     computerObject.MoveTo(group);
                     group.CommitChanges();
                 }
-            } 
+            }
         }
 
         public void MoveSessionHostToCollectionOU(string hostName, string collectionName, string organizationId)
@@ -2147,7 +2147,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             }
             catch (AmbiguousMatchException)
             {
-                
+
             }
 
             return Errors.OK;
@@ -2164,15 +2164,15 @@ namespace SolidCP.Providers.RemoteDesktopServices
                 ActiveDirectoryUtils.RemoveOUSecurityfromSid(tenantComputerGroupPath, WellKnownSidType.AuthenticatedUserSid, ActiveDirectoryRights.ListChildren, AccessControlType.Allow, ActiveDirectorySecurityInheritance.SelfAndChildren);
             }
 
-            hostName = hostName.ToLower().Replace(string.Format(".{0}", ServerSettings.ADRootDomain.ToLower()), "");            
+            hostName = hostName.ToLower().Replace(string.Format(".{0}", ServerSettings.ADRootDomain.ToLower()), "");
             var rootComputerPath = GetRdsServerPath(hostName);
-            var tenantComputerPath = GetTenantComputerPath(hostName, organizationId);            
+            var tenantComputerPath = GetTenantComputerPath(hostName, organizationId);
 
             if (!string.IsNullOrEmpty(ComputersRootOU))
-            {                
+            {
                 CheckOrCreateComputersRoot(GetComputersRootPath());
-            }            
-            
+            }
+
             var computerObject = GetComputerObject(hostName);
 
             if (computerObject != null)
@@ -2185,32 +2185,32 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     computerObject.MoveTo(group);
                     group.CommitChanges();
                 }
-            } 
+            }
         }
 
         public void RemoveRdsServerFromTenantOU(string hostName, string organizationId)
         {
             var tenantComputerGroupPath = GetTenantComputerGroupPath(organizationId);
-            hostName = hostName.ToLower().Replace(string.Format(".{0}", ServerSettings.ADRootDomain.ToLower()), "");                                    
+            hostName = hostName.ToLower().Replace(string.Format(".{0}", ServerSettings.ADRootDomain.ToLower()), "");
 
             if (!string.IsNullOrEmpty(ComputersRootOU))
             {
                 CheckOrCreateComputersRoot(GetComputersRootPath());
                 ActiveDirectoryUtils.RemoveOUSecurityfromSid(GetComputersRootPath(), WellKnownSidType.AuthenticatedUserSid, ActiveDirectoryRights.ListObject, AccessControlType.Allow, ActiveDirectorySecurityInheritance.SelfAndChildren);
                 ActiveDirectoryUtils.RemoveOUSecurityfromSid(GetComputersRootPath(), WellKnownSidType.AuthenticatedUserSid, ActiveDirectoryRights.ListChildren, AccessControlType.Allow, ActiveDirectorySecurityInheritance.SelfAndChildren);
-            }            
+            }
 
             if (!ActiveDirectoryUtils.AdObjectExists(tenantComputerGroupPath))
             {
                 ActiveDirectoryUtils.CreateOrganizationalUnit(RdsServersOU, GetOrganizationPath(organizationId));
             }
-            
+
             var computerObject = GetComputerObject(hostName);
-            
+
             if (computerObject != null)
             {
                 var samName = (string)ActiveDirectoryUtils.GetADObjectProperty(computerObject, "sAMAccountName");
-                
+
                 if (ActiveDirectoryUtils.AdObjectExists(GetComputersRootPath()) && !string.IsNullOrEmpty(ComputersRootOU) && !ActiveDirectoryUtils.IsComputerInGroup(samName, RdsServersRootOU))
                 {
                     DirectoryEntry group = new DirectoryEntry(GetRdsServersGroupPath());
@@ -2262,7 +2262,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             return reply != null && reply.Status == IPStatus.Success;
         }
-        
+
         #region Helpers
 
         private static string ConvertByteToStringSid(Byte[] sidBytes)
@@ -2359,7 +2359,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 remoteApp.Users = null;
             }
-            
+
             return remoteApp;
         }
 
@@ -2412,15 +2412,15 @@ namespace SolidCP.Providers.RemoteDesktopServices
             switch (policyType)
             {
                 case RdsPolicyTypes.RdCap:
-                {
-                    policyName += "RDCAP";
-                    break;
-                }
+                    {
+                        policyName += "RDCAP";
+                        break;
+                    }
                 case RdsPolicyTypes.RdRap:
-                {
-                    policyName += "RDRAP";
-                    break;
-                }
+                    {
+                        policyName += "RDRAP";
+                        break;
+                    }
             }
 
             return policyName;
@@ -2444,7 +2444,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         internal string GetComputerGroupPath(string organizationId, string collection)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             AppendProtocol(sb);
             AppendDomainController(sb);
             AppendCNPath(sb, GetComputersGroupName(collection));
@@ -2453,16 +2453,16 @@ namespace SolidCP.Providers.RemoteDesktopServices
             AppendDomainPath(sb, RootDomain);
 
             return sb.ToString();
-        }        
+        }
 
         internal string GetUsersGroupPath(string organizationId, string collection)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             AppendProtocol(sb);
             AppendDomainController(sb);
             AppendCNPath(sb, GetUsersGroupName(collection));
-            AppendOUPath(sb, organizationId);            
+            AppendOUPath(sb, organizationId);
             AppendOUPath(sb, RootOU);
             AppendDomainPath(sb, RootDomain);
 
@@ -2516,7 +2516,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             StringBuilder sb = new StringBuilder();
             // append provider
             AppendProtocol(sb);
-            AppendDomainController(sb);                        
+            AppendDomainController(sb);
             AppendOUPath(sb, RootOU);
             AppendDomainPath(sb, RootDomain);
 
@@ -2542,16 +2542,16 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 Filter = string.Format("(&(objectCategory=computer)(name={0}))", computerName)
             };
-            
+
             SearchResult results = deSearch.FindOne();
-            
+
             return results.GetDirectoryEntry();
-        }        
+        }
 
         private string GetTenantComputerPath(string objName, string organizationId)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             AppendProtocol(sb);
             AppendDomainController(sb);
             AppendCNPath(sb, objName);
@@ -2566,7 +2566,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private string GetComputersRootPath()
         {
             StringBuilder sb = new StringBuilder();
-            
+
             AppendProtocol(sb);
             AppendDomainController(sb);
             AppendOUPath(sb, ComputersRootOU);
@@ -2608,7 +2608,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             AppendProtocol(sb);
             AppendDomainController(sb);
-            AppendDomainPath(sb, RootDomain);        
+            AppendDomainPath(sb, RootDomain);
 
             return sb.ToString();
         }
@@ -2629,7 +2629,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         internal string GetTenantComputerGroupPath(string organizationId)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             AppendProtocol(sb);
             AppendDomainController(sb);
             AppendOUPath(sb, RdsServersOU);
@@ -2638,7 +2638,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             AppendDomainPath(sb, RootDomain);
 
             return sb.ToString();
-        }        
+        }
 
         private static void AppendCNPath(StringBuilder sb, string organizationId)
         {
@@ -2705,15 +2705,15 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
         internal bool IsFeatureInstalled(string hostName, string featureName, Runspace runSpace)
         {
-            bool isInstalled = false;            
+            bool isInstalled = false;
             Command cmd = new Command("Get-WindowsFeature");
             cmd.Parameters.Add("Name", featureName);
             var feature = runSpace.ExecuteRemoteShellCommand(hostName, cmd, PrimaryDomainController).FirstOrDefault();
-            
+
             if (feature != null)
             {
                 isInstalled = (bool)RdsRunspaceExtensions.GetPSObjectProperty(feature, "Installed");
-            }            
+            }
 
             return isInstalled;
         }
@@ -2746,13 +2746,13 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 cmd.Parameters.Add("IncludeAllSubFeature", "");
             }
-            
+
             if (restart)
             {
                 cmd.Parameters.Add("Restart", "");
             }
 
-            return runSpace.ExecuteRemoteShellCommand(hostName, cmd, PrimaryDomainController).FirstOrDefault();            
+            return runSpace.ExecuteRemoteShellCommand(hostName, cmd, PrimaryDomainController).FirstOrDefault();
         }
 
         #endregion
@@ -2818,7 +2818,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             return result;
         }
 
-        internal bool ItemExistsRemote(Runspace runSpace, string hostname,string path)
+        internal bool ItemExistsRemote(Runspace runSpace, string hostname, string path)
         {
             Command testPathCommand = new Command("Test-Path");
             testPathCommand.Parameters.Add("Path", string.Format("\"{0}\"", path));
@@ -2857,7 +2857,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         {
             object[] errors;
             Command cmd = new Command("Set-RDSessionCollectionConfiguration");
-            cmd.Parameters.Add("CollectionName", collection.Name);            
+            cmd.Parameters.Add("CollectionName", collection.Name);
             cmd.Parameters.Add("ConnectionBroker", ConnectionBroker);
 
             if (string.IsNullOrEmpty(collection.Settings.ClientDeviceRedirectionOptions))
@@ -2867,7 +2867,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             var properties = collection.Settings.GetType().GetProperties();
 
-            foreach(var prop in properties)
+            foreach (var prop in properties)
             {
                 if (prop.Name.ToLower() != "id" && prop.Name.ToLower() != "rdscollectionid")
                 {
@@ -2894,15 +2894,15 @@ namespace SolidCP.Providers.RemoteDesktopServices
         {
             var result = new List<RdsUserSession>();
             var scripts = new List<string>();
-            scripts.Add(string.Format("Get-RDUserSession -ConnectionBroker {0} - CollectionName {1} | ft CollectionName, Username, UnifiedSessionId, SessionState, HostServer", ConnectionBroker, collectionName));            
+            scripts.Add(string.Format("Get-RDUserSession -ConnectionBroker {0} - CollectionName {1} | ft CollectionName, Username, UnifiedSessionId, SessionState, HostServer", ConnectionBroker, collectionName));
             object[] errors;
             Command cmd = new Command("Get-RDUserSession");
             cmd.Parameters.Add("CollectionName", collectionName);
             cmd.Parameters.Add("ConnectionBroker", ConnectionBroker);
-            var userSessions = runSpace.ExecuteShellCommand(cmd, false, PrimaryDomainController, out errors);            
-            var properties = typeof(RdsUserSession).GetProperties();            
+            var userSessions = runSpace.ExecuteShellCommand(cmd, false, PrimaryDomainController, out errors);
+            var properties = typeof(RdsUserSession).GetProperties();
 
-            foreach(var userSession in  userSessions)
+            foreach (var userSession in userSessions)
             {
                 object collectionNameObj = RdsRunspaceExtensions.GetPSObjectProperty(userSession, "CollectionName");
                 object domainName = RdsRunspaceExtensions.GetPSObjectProperty(userSession, "DomainName");
@@ -2919,8 +2919,8 @@ namespace SolidCP.Providers.RemoteDesktopServices
                     SessionState = sessionState != null ? sessionState.ToString() : "",
                     UnifiedSessionId = unifiedSessionId != null ? unifiedSessionId.ToString() : "",
                     SamAccountName = samAccountName != null ? samAccountName.ToString() : ""
-                };                                
-                                
+                };
+
                 session.IsVip = false;
                 session.UserName = GetUserFullName(session.DomainName, session.SamAccountName, runSpace);
                 result.Add(session);
@@ -2976,7 +2976,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
 
             try
             {
-                runspace = RdsRunspaceExtensions.OpenRunspace();                
+                runspace = RdsRunspaceExtensions.OpenRunspace();
                 result = GetRdsServerStatus(runspace, serverName);
 
             }
@@ -2989,7 +2989,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         public void ShutDownRdsServer(string serverName)
-        {            
+        {
             Runspace runspace = null;
 
             try
@@ -3043,7 +3043,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         private RdsServerInfo GetServerInfo(Runspace runspace, string serverName)
         {
             Log.WriteInfo("RDS GetServerInfo {0}", serverName);
-            var result = new RdsServerInfo(); 
+            var result = new RdsServerInfo();
             Command cmd = new Command("Get-WmiObject");
             cmd.Parameters.Add("Class", "Win32_Processor");
             cmd.Parameters.Add("ComputerName", serverName);
@@ -3079,7 +3079,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             return result;
         }
 
-        private string GetRdsServerStatus (Runspace runspace, string serverName)
+        private string GetRdsServerStatus(Runspace runspace, string serverName)
         {
             if (CheckServerAvailability(serverName))
             {
@@ -3111,7 +3111,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             {
                 Log.WriteWarning(string.Join("\r\n", errors.Select(e => e.ToString()).ToArray()));
                 return result;
-            }            
+            }
 
             foreach (var psDrive in psDrives)
             {
@@ -3130,7 +3130,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
         }
 
         private bool CheckRDSServerAvaliability(string serverName)
-        {            
+        {
             var ping = new Ping();
             var reply = ping.Send(serverName, 1000);
 

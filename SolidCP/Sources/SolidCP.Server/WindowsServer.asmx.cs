@@ -32,40 +32,27 @@
 
 using System;
 using System.IO;
-using System.Data;
 using System.Security;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Web;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.ComponentModel;
 using System.ServiceProcess;
-using System.ServiceModel;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Management;
-using System.Collections.Specialized;
 using Microsoft.Web.PlatformInstaller;
 using Microsoft.Web.Services3;
-using System.Web.UI.WebControls;
 using Microsoft.Win32;
 using SolidCP.Providers.Utils;
 using SolidCP.Server.Code;
 using SolidCP.Server.Utils;
 using SolidCP.Providers;
 using SolidCP.Server.WPIService;
-
-
-
-
-
-
 
 namespace SolidCP.Server
 {
@@ -91,17 +78,17 @@ namespace SolidCP.Server
                 // parse returned string
                 StringReader reader = new StringReader(ret);
                 string line = null;
-				int lineIndex = 0;
+                int lineIndex = 0;
                 while ((line = reader.ReadLine()) != null)
                 {
                     /*if (line.IndexOf("USERNAME") != -1 )
                         continue;*/
-					//
-					if (lineIndex == 0)
-					{
-						lineIndex++;
-						continue;
-					}
+                    //
+                    if (lineIndex == 0)
+                    {
+                        lineIndex++;
+                        continue;
+                    }
 
                     Regex re = new Regex(@"(\S+)\s+", RegexOptions.Multiline | RegexOptions.IgnoreCase);
                     MatchCollection matches = re.Matches(line);
@@ -116,15 +103,15 @@ namespace SolidCP.Server
                     if (username != "")
                     {
                         TerminalSession session = new TerminalSession();
-						//
+                        //
                         session.SessionId = Int32.Parse(matches[2].Value.Trim());
                         session.Username = username;
                         session.Status = matches[3].Value.Trim();
 
                         sessions.Add(session);
                     }
-					//
-					lineIndex++;
+                    //
+                    lineIndex++;
                 }
                 reader.Close();
 
@@ -307,19 +294,16 @@ namespace SolidCP.Server
 
         #region Web Platform Installer
 
-      
-
         private string Linkify(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return value;
 
             //" qweqwe http://www.helicontech.com/zoo/feed/  asdasdasd"
-            Regex link =new Regex("(http[^\\s,]+)(?<![.,])");
+            Regex link = new Regex("(http[^\\s,]+)(?<![.,])");
 
-            return link.Replace(value,"<a href=\"$1\" target=\"_blank\">$1</a>");
+            return link.Replace(value, "<a href=\"$1\" target=\"_blank\">$1</a>");
         }
-
 
         private WPIProduct ProductToWPIProduct(Product product)
         {
@@ -329,7 +313,7 @@ namespace SolidCP.Server
             p.LongDescription = Linkify(product.LongDescription);
             p.Published = product.Published;
             p.Author = product.Author;
-            p.AuthorUri = (product.AuthorUri != null) ? product.AuthorUri.ToString() : ""; 
+            p.AuthorUri = (product.AuthorUri != null) ? product.AuthorUri.ToString() : "";
             p.Title = product.Title;
             p.Link = (product.Link != null) ? product.Link.ToString() : "";
             p.Version = product.Version;
@@ -339,7 +323,7 @@ namespace SolidCP.Server
                 if (product.Installers[0].EulaUrl != null)
                 {
                     p.EulaUrl = product.Installers[0].EulaUrl.ToString();
-                    
+
                 }
 
                 if (product.Installers[0].InstallerFile != null)
@@ -384,7 +368,7 @@ namespace SolidCP.Server
                     product.IsUpgrade = true;
                     product.IsInstalled = false;
                 }
-                
+
             }
         }
 
@@ -400,7 +384,7 @@ namespace SolidCP.Server
             }
             catch (ArgumentException)
             {
-                return String.Compare(newVersion,oldVersion, StringComparison.Ordinal);
+                return String.Compare(newVersion, oldVersion, StringComparison.Ordinal);
 
             }
         }
@@ -462,7 +446,7 @@ namespace SolidCP.Server
 
                 }
 
-               
+
 
                 Log.WriteEnd("GetWPIProducts");
                 return wpiProducts.ToArray();
@@ -488,7 +472,7 @@ namespace SolidCP.Server
 
                 WpiHelper wpi = GetWpiFeed();
 
-                List<Product> products = wpi.GetProductsFiltered( filter);
+                List<Product> products = wpi.GetProductsFiltered(filter);
 
                 if (products != null)
                 {
@@ -572,8 +556,8 @@ namespace SolidCP.Server
             }
         }
 
-       
-        static private string[] _feeds = new string[]{};
+
+        static private string[] _feeds = new string[] { };
 
         [WebMethod]
         public void InitWPIFeeds(string feedUrls)
@@ -693,16 +677,16 @@ namespace SolidCP.Server
                 StartWpiService();
 
                 RegisterWpiService();
-                
+
                 WPIServiceContract client = new WPIServiceContract();
 
                 client.Initialize(_feeds);
                 client.BeginInstallation(products);
 
-                
 
 
-               
+
+
                 Log.WriteEnd("InstallWPIProducts");
             }
             catch (Exception ex)
@@ -712,7 +696,7 @@ namespace SolidCP.Server
             }
         }
 
-     
+
         private void StartWpiService()
         {
             string binFolder = HttpContext.Current.Server.MapPath("/bin/");
@@ -794,7 +778,7 @@ namespace SolidCP.Server
                 Log.WriteStart("GetWPIStatus");
 
                 RegisterWpiService();
-                
+
                 WPIServiceContract client = new WPIServiceContract();
 
                 string status = client.GetStatus();
@@ -828,7 +812,7 @@ namespace SolidCP.Server
                 Log.WriteStart("WpiGetLogFileDirectory");
 
                 RegisterWpiService();
-                
+
                 WPIServiceContract client = new WPIServiceContract();
 
                 string result = client.GetLogFileDirectory();
@@ -864,7 +848,7 @@ namespace SolidCP.Server
                         string fileContent = SecurityElement.Escape(StringUtils.CleanupASCIIControlCharacters(streamReader.ReadToEnd()));
                         result.Add(new SettingPair(filePath, fileContent));
                     }
-                    
+
                 }
 
                 Log.WriteEnd("WpiGetLogFileDirectory");
@@ -881,9 +865,9 @@ namespace SolidCP.Server
             }
         }
 
-        
-      
-     
+
+
+
 
         static WpiHelper wpi = null;
         WpiHelper GetWpiFeed()
@@ -905,8 +889,8 @@ namespace SolidCP.Server
         {
             lock (_lockRegisterWpiService)
             {
-                
-                
+
+
                 try
                 {
                     ChannelServices.RegisterChannel(new TcpChannel(), true);
@@ -934,12 +918,12 @@ namespace SolidCP.Server
                     //StartWpiService();
                 }
 
-               
-             
+
+
 
             }
 
-            
+
         }
         #endregion GetWPIProducts
 
@@ -965,7 +949,7 @@ namespace SolidCP.Server
 
             if (String.IsNullOrEmpty(logName))
                 return entries;
-			
+
             EventLog log = new EventLog(logName);
             EventLogEntryCollection logEntries = log.Entries;
             int count = logEntries.Count;
@@ -989,7 +973,7 @@ namespace SolidCP.Server
                 result.Entries = new SystemLogEntry[] { };
                 return result;
             }
-			
+
             EventLog log = new EventLog(logName);
             EventLogEntryCollection logEntries = log.Entries;
             int count = logEntries.Count;
@@ -1012,8 +996,8 @@ namespace SolidCP.Server
         [WebMethod]
         public void ClearLog(string logName)
         {
-			EventLog log = new EventLog(logName);
-			log.Clear();
+            EventLog log = new EventLog(logName);
+            log.Clear();
         }
 
         private SystemLogEntry CreateLogEntry(EventLogEntry logEntry, bool includeMessage)
@@ -1086,5 +1070,5 @@ namespace SolidCP.Server
         #endregion
     }
 
- 
+
 }
