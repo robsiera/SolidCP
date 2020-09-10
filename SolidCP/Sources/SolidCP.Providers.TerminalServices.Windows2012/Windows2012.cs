@@ -1449,7 +1449,7 @@ namespace SolidCP.Providers.RemoteDesktopServices
             var scripts = new List<string>
             {
                 $"$adgpo = [ADSI]\"{GetGpoPath(gpoId)}\"",
-                $"$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule([System.Security.Principal.NTAccount]\"{RootDomain.Split('.').First()}\\{GetLocalAdminsGroupName(collectionName)}\",\"ExtendedRight\",\"Deny\",[GUID]\"edacfd8f-ffb3-11d1-b41d-00a0c968f939\")",
+                $"$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule([System.Security.Principal.NTAccount]\"{ActiveDirectoryUtils.GetNETBIOSDomainName(RootDomain)}\\{GetLocalAdminsGroupName(collectionName)}\",\"ExtendedRight\",\"Deny\",[GUID]\"edacfd8f-ffb3-11d1-b41d-00a0c968f939\")",
                 $"$acl = $adgpo.ObjectSecurity",
                 $"$acl.AddAccessRule($rule)",
                 $"$adgpo.CommitChanges()"
