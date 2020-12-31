@@ -1854,14 +1854,18 @@ namespace SolidCP.EnterpriseServer
             //}
         }
 
-        public static bool SetDefaultTopPackage(int userId, int packageId) {
+        public static bool SetDefaultTopPackage(int userId, int packageId)
+        {
             List<PackageInfo> lpi = GetPackages(userId);
-            foreach(PackageInfo pi in lpi) {
-                if(pi.DefaultTopPackage) {
+            foreach (PackageInfo pi in lpi)
+            {
+                if (pi.DefaultTopPackage)
+                {
                     pi.DefaultTopPackage = false;
                     UpdatePackage(pi);
                 }
-                if(pi.PackageId == packageId) {
+                if (pi.PackageId == packageId)
+                {
                     pi.DefaultTopPackage = true;
                     UpdatePackage(pi);
                 }
@@ -2279,8 +2283,7 @@ namespace SolidCP.EnterpriseServer
             }
             catch (ParserException ex)
             {
-                return String.Format("Error in template (Line {0}, Column {1}): {2}",
-                    ex.Line, ex.Column, ex.Message);
+                return String.Format("Error in template (Line {0}, Column {1}): {2}", ex.Line, ex.Column, ex.Message);
             }
             catch (Exception e)
             {

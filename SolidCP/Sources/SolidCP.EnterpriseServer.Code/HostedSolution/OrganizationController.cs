@@ -524,7 +524,7 @@ namespace SolidCP.EnterpriseServer
                 DomainInfo domain = ServerController.GetDomain(domainId);
                 if (domain == null)
                     return -1;
-                
+
                 // Log Extension
                 LogExtension.SetItemName(domain.DomainName);
                 LogExtension.WriteObject(domain);
@@ -971,7 +971,7 @@ namespace SolidCP.EnterpriseServer
                 packageId, typeof(Organization), recursive);
 
             return items.ConvertAll<Organization>(
-                delegate(ServiceProviderItem item) { return (Organization)item; });
+                delegate (ServiceProviderItem item) { return (Organization)item; });
         }
 
         public static DataSet GetRawOrganizationsPaged(int packageId, bool recursive,
@@ -1222,12 +1222,12 @@ namespace SolidCP.EnterpriseServer
                                     {
                                         SharePointEnterpriseSiteCollectionListPaged sharePointStats = HostedSharePointServerEntController.GetSiteCollectionsPaged(org.PackageId, o.Id, string.Empty, string.Empty, string.Empty, 0, 0);
                                         stats.CreatedSharePointEnterpriseSiteCollections += sharePointStats.TotalRowCount;
-                                    }                                    
+                                    }
 
 
                                     if (cntxTmp.Groups.ContainsKey(ResourceGroups.HostedCRM))
                                     {
-                                        stats.CreatedCRMUsers += CRMController.GetCRMUsersCount(o.Id, string.Empty, string.Empty, CRMUserLycenseTypes.FULL ).Value;
+                                        stats.CreatedCRMUsers += CRMController.GetCRMUsersCount(o.Id, string.Empty, string.Empty, CRMUserLycenseTypes.FULL).Value;
                                         stats.CreatedLimitedCRMUsers += CRMController.GetCRMUsersCount(o.Id, string.Empty, string.Empty, CRMUserLycenseTypes.LIMITED).Value;
                                         stats.CreatedESSCRMUsers += CRMController.GetCRMUsersCount(o.Id, string.Empty, string.Empty, CRMUserLycenseTypes.ESS).Value;
                                         stats.UsedCRMDiskSpace += CRMController.GetDBSize(o.Id, o.PackageId);
@@ -1390,7 +1390,7 @@ namespace SolidCP.EnterpriseServer
             var quotas = Array.FindAll(cntx.QuotasArray, x => x.QuotaName.Contains(Quotas.SERVICE_LEVELS));
             foreach (var quota in quotas)
             {
-               int levelId = serviceLevels.First(x => x.LevelName == quota.QuotaName.Replace(Quotas.SERVICE_LEVELS, "")).LevelId;
+                int levelId = serviceLevels.First(x => x.LevelName == quota.QuotaName.Replace(Quotas.SERVICE_LEVELS, "")).LevelId;
                 int usedInOrgCount = accounts.Count(x => x.LevelId == levelId);
 
                 quota.QuotaUsedValue = usedInOrgCount;
@@ -1495,7 +1495,7 @@ namespace SolidCP.EnterpriseServer
                     // add domain
                     domain.DomainId = domainId;
                 }
-                
+
                 // Log Extension
                 LogExtension.WriteObject(domain);
 
@@ -1589,7 +1589,7 @@ namespace SolidCP.EnterpriseServer
 
                 // load organization
                 Organization newDefaultOrg = GetOrganization(newDefaultOrganizationId);
-                
+
                 newDefaultOrg.IsDefault = true;
                 // save changes
                 PackageController.UpdatePackageItem(newDefaultOrg);
@@ -2006,7 +2006,7 @@ namespace SolidCP.EnterpriseServer
                     priority = (MailPriority)Enum.Parse(typeof(MailPriority), settings["Priority"], true);
                 }
 
-                string pincode = GeneratePincode() ;
+                string pincode = GeneratePincode();
 
                 Hashtable items = new Hashtable();
 
@@ -2016,7 +2016,7 @@ namespace SolidCP.EnterpriseServer
 
                 body = PackageController.EvaluateTemplate(body, items);
 
-                    SetAccessTokenResponse(token, pincode);
+                SetAccessTokenResponse(token, pincode);
 
                 TaskManager.Write("Organization ID : " + user.ItemId);
                 TaskManager.Write("Account : " + user.DisplayName);
@@ -2161,12 +2161,12 @@ namespace SolidCP.EnterpriseServer
 
                 if (!String.IsNullOrEmpty(settings["Priority"]))
                 {
-                    priority = (MailPriority) Enum.Parse(typeof (MailPriority), settings["Priority"], true);
+                    priority = (MailPriority)Enum.Parse(typeof(MailPriority), settings["Priority"], true);
                 }
 
                 Guid token;
 
-                string pincode = finalStep ? GeneratePincode() :  null;
+                string pincode = finalStep ? GeneratePincode() : null;
 
                 Hashtable items = new Hashtable();
 
@@ -2511,10 +2511,10 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "CREATE_USER", displayName, itemId);
-            
+
             // Log Extension
-            LogExtension.WriteVariables(new {name, domain, subscriberNumber});
-            
+            LogExtension.WriteVariables(new { name, domain, subscriberNumber });
+
             int userId = -1;
 
             try
@@ -2556,13 +2556,13 @@ namespace SolidCP.EnterpriseServer
 
                 // Log Extension
                 LogExtension.WriteVariable("Account Name", SamAccountName);
-                LogExtension.WriteVariables(new {upn});
+                LogExtension.WriteVariables(new { upn });
 
                 if (orgProxy.CreateUser(org.OrganizationId, SamAccountName, displayName, upn, password, enabled) == 0)
                 {
                     accountName = SamAccountName;
                     OrganizationUser retUser = orgProxy.GetUserGeneralSettings(SamAccountName, org.OrganizationId);
-                    
+
                     // Log Extension
                     LogExtension.WriteVariable("sAMAccountName", retUser.DomainUserName);
 
@@ -2700,7 +2700,6 @@ namespace SolidCP.EnterpriseServer
             return userId;
         }
 
-
         private static void AddAccountEmailAddress(int accountId, string emailAddress)
         {
             DataProvider.AddExchangeAccountEmailAddress(accountId, emailAddress);
@@ -2781,7 +2780,6 @@ namespace SolidCP.EnterpriseServer
                     return login.Substring(0, login.Length - (fullLen - maxLogin)) + strCounter;
                 else return strCounter; // ????
             }
-
         }
 
 
@@ -2808,9 +2806,9 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "SET_DELETED_USER", itemId);
-            
+
             // Log Extension
-            LogExtension.WriteVariables(new {enableForceArchive});
+            LogExtension.WriteVariables(new { enableForceArchive });
 
             try
             {
@@ -2847,7 +2845,7 @@ namespace SolidCP.EnterpriseServer
 
                 // load account
                 ExchangeAccount account = ExchangeServerController.GetAccount(itemId, accountId);
-                
+
                 // Log Extension
                 LogExtension.SetItemName(account.DisplayName);
 
@@ -2996,7 +2994,7 @@ namespace SolidCP.EnterpriseServer
 
             ObjectUtils.FillCollectionFromDataSet(schedules, SchedulerController.GetSchedules(packageId));
 
-            foreach(var schedule in schedules)
+            foreach (var schedule in schedules)
             {
                 if (schedule.TaskId == taskId)
                 {
@@ -3010,21 +3008,21 @@ namespace SolidCP.EnterpriseServer
         private static int AddScheduleTask(int packageId, string taskId, string taskName)
         {
             return SchedulerController.AddSchedule(new ScheduleInfo
-                {
-                    PackageId = packageId,
-                    TaskId = taskId,
-                    ScheduleName = taskName,
-                    ScheduleTypeId = "Daily",
-                    FromTime = new DateTime(2000, 1, 1, 0, 0, 0),
-                    ToTime = new DateTime(2000, 1, 1, 23, 59, 59),
-                    Interval = 3600,
-                    StartTime = new DateTime(2000, 01, 01, 0, 30, 0),
-                    MaxExecutionTime = 3600,
-                    PriorityId = "Normal",
-                    Enabled = true,
-                    WeekMonthDay = 1,
-                    HistoriesNumber = 0
-                });
+            {
+                PackageId = packageId,
+                TaskId = taskId,
+                ScheduleName = taskName,
+                ScheduleTypeId = "Daily",
+                FromTime = new DateTime(2000, 1, 1, 0, 0, 0),
+                ToTime = new DateTime(2000, 1, 1, 23, 59, 59),
+                Interval = 3600,
+                StartTime = new DateTime(2000, 01, 01, 0, 30, 0),
+                MaxExecutionTime = 3600,
+                PriorityId = "Normal",
+                Enabled = true,
+                WeekMonthDay = 1,
+                HistoriesNumber = 0
+            });
         }
 
         private static bool CheckFolderExists(int packageId, string path, string folderName)
@@ -3069,7 +3067,7 @@ namespace SolidCP.EnterpriseServer
         private static string GetDirectory(string path)
         {
             var drive = System.IO.Path.GetPathRoot(path);
-            
+
             return path.Replace(drive, string.Empty);
         }
 
@@ -3141,7 +3139,7 @@ namespace SolidCP.EnterpriseServer
 
                 // load account
                 ExchangeAccount user = ExchangeServerController.GetAccount(itemId, accountId);
-                
+
                 // Log Extension
                 LogExtension.SetItemName(user.DisplayName);
 
@@ -3168,7 +3166,7 @@ namespace SolidCP.EnterpriseServer
                     }
                 }
 
-                if (user.AccountType == ExchangeAccountType.User )
+                if (user.AccountType == ExchangeAccountType.User)
                 {
                     //Delete user from AD
                     orgProxy.DeleteUser(account, org.OrganizationId);
@@ -3373,7 +3371,7 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "UPDATE_USER_GENERAL", displayName, itemId);
-            
+
             try
             {
                 displayName = displayName.Trim();
@@ -3393,7 +3391,7 @@ namespace SolidCP.EnterpriseServer
                 ExchangeAccount account = ExchangeServerController.GetAccount(itemId, accountId);
 
                 // Log Extension
-                LogExtension.WriteVariables(new {notes});
+                LogExtension.WriteVariables(new { notes });
 
                 string accountName = GetAccountName(account.AccountName);
                 // get mailbox settings
@@ -3490,11 +3488,11 @@ namespace SolidCP.EnterpriseServer
 
                 // load account
                 OrganizationUser user = GetUserGeneralSettings(itemId, accountId);
-               
+
                 // Log Extension
                 LogExtension.SetItemName(user.DisplayName);
                 LogExtension.WriteObject(user);
-                LogExtension.WriteVariables(new {inherit});
+                LogExtension.WriteVariables(new { inherit });
                 user.LogPropertyIfChanged(u => u.UserPrincipalName, userPrincipalName);
 
                 if (user.UserPrincipalName != userPrincipalName)
@@ -3927,9 +3925,9 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "CREATE_SECURITY_GROUP", displayName, itemId);
-            
+
             // Log Extension
-            LogExtension.WriteVariables(new {displayName});
+            LogExtension.WriteVariables(new { displayName });
 
             int securityGroupId = -1;
 
@@ -3958,14 +3956,14 @@ namespace SolidCP.EnterpriseServer
                 Organizations orgProxy = GetOrganizationProxy(org.ServiceId);
 
                 string groupName = BuildAccountNameEx(org, displayName.Replace(" ", ""));
-                
+
                 // Log Extension
-                LogExtension.WriteVariables(new {groupName});
+                LogExtension.WriteVariables(new { groupName });
 
                 if (orgProxy.CreateSecurityGroup(org.OrganizationId, groupName) == 0)
                 {
                     OrganizationSecurityGroup retSecurityGroup = orgProxy.GetSecurityGroupGeneralSettings(groupName, org.OrganizationId);
-                    
+
                     // Log Extension
                     LogExtension.WriteObject(retSecurityGroup);
 
@@ -4026,9 +4024,9 @@ namespace SolidCP.EnterpriseServer
                 //OrganizationSecurityGroup securityGroup = orgProxy.GetSecurityGroupGeneralSettings(account.AccountName, org.OrganizationId);
                 string groupName;
                 string[] parts = account.SamAccountName.Split('\\');
-                if (parts.Length == 2) 
+                if (parts.Length == 2)
                     groupName = parts[1];
-                else 
+                else
                     groupName = account.SamAccountName;
 
                 OrganizationSecurityGroup securityGroup = orgProxy.GetSecurityGroupGeneralSettings(groupName, org.OrganizationId);
@@ -4087,7 +4085,7 @@ namespace SolidCP.EnterpriseServer
 
                 // load account
                 ExchangeAccount account = ExchangeServerController.GetAccount(itemId, accountId);
-                
+
                 // Log Extension
                 LogExtension.SetItemName(account.DisplayName);
 
@@ -4117,7 +4115,7 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "UPDATE_SECURITY_GROUP_GENERAL", displayName, itemId);
-            
+
             try
             {
                 displayName = displayName.Trim();
@@ -4135,7 +4133,7 @@ namespace SolidCP.EnterpriseServer
                 ExchangeAccount account = ExchangeServerController.GetAccount(itemId, accountId);
 
                 // Log Extension
-                LogExtension.WriteVariables(new {notes});
+                LogExtension.WriteVariables(new { notes });
 
                 string accountName = GetAccountName(account.AccountName);
                 // get mailbox settings
@@ -4143,7 +4141,7 @@ namespace SolidCP.EnterpriseServer
                 // external email
 
                 var oldObj = orgProxy.GetSecurityGroupGeneralSettings(accountName, org.OrganizationId);
-                
+
                 orgProxy.SetSecurityGroupGeneralSettings(
                     org.OrganizationId,
                     accountName,
@@ -4155,7 +4153,7 @@ namespace SolidCP.EnterpriseServer
                 // Log Extension
                 account.LogPropertyIfChanged(a => a.DisplayName, displayName);
                 LogExtension.LogPropertiesIfChanged(oldObj, newObj);
-                
+
                 // update account
                 account.DisplayName = displayName;
 
@@ -4283,9 +4281,9 @@ namespace SolidCP.EnterpriseServer
 
             // place log record
             TaskManager.StartTask("ORGANIZATION", "DELETE_USER_FROM_SECURITY_GROUP", itemId);
-            
+
             // Log Extension
-            LogExtension.WriteVariables(new {groupName});
+            LogExtension.WriteVariables(new { groupName });
 
             try
             {
@@ -4296,7 +4294,7 @@ namespace SolidCP.EnterpriseServer
 
                 // load user account
                 ExchangeAccount account = ExchangeServerController.GetAccount(itemId, accountId);
-                
+
                 // Log Extension
                 LogExtension.SetItemName(account.DisplayName);
 
@@ -4521,7 +4519,7 @@ namespace SolidCP.EnterpriseServer
                 if (CheckServiceLevelUsage(levelId)) res.AddError("SERVICE_LEVEL_IN_USE", new ApplicationException("Service Level is being used"));
 
                 if (res.IsSuccess)
-                DataProvider.DeleteSupportServiceLevel(levelId);
+                    DataProvider.DeleteSupportServiceLevel(levelId);
             }
             catch (Exception ex)
             {
@@ -4543,8 +4541,8 @@ namespace SolidCP.EnterpriseServer
             try
             {
                 // Log Extension
-                LogExtension.WriteVariables(new { levelID, levelName, levelDescription }); 
-                
+                LogExtension.WriteVariables(new { levelID, levelName, levelDescription });
+
                 DataProvider.UpdateSupportServiceLevel(levelID, levelName, levelDescription);
             }
             catch (Exception ex)
