@@ -2263,7 +2263,16 @@ namespace SolidCP.EnterpriseServer
                 if (items != null)
                 {
                     foreach (string key in items.Keys)
-                        tmp[key] = items[key];
+                    {
+                        try
+                        {
+                            tmp[key] = items[key];
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception("Error while adding template with key [" + key + "].", e);
+                        }
+                    }
                 }
 
                 tmp.Evaluate(writer);
@@ -2273,6 +2282,11 @@ namespace SolidCP.EnterpriseServer
                 return String.Format("Error in template (Line {0}, Column {1}): {2}",
                     ex.Line, ex.Column, ex.Message);
             }
+            catch (Exception e)
+            {
+                throw new Exception("Error while adding template.", e);
+            }
+
             return writer.ToString();
         }
         #endregion
